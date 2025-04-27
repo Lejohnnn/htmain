@@ -32,7 +32,6 @@ def createItinerary():
 
 
 
-
 #chat intro
 print("Welcome to your new favorite planning utility. My name is [blank] and I will be your travel assistant!")
 username = input("Let's start by getting you name: ")
