@@ -16,6 +16,20 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 # ----- add pdf saving functionality
 # ----- space out print statements
 
+def saveItineraryToPDF(itinerary_text, destination, travel_dates):
+    # create downloadable PDF
+    itinerarypdf = FPDF()
+    itinerarypdf.add_page()
+    itinerarypdf.set_font("Arial", size=12)
+
+    itinerarypdf.cell(200, 10, txt="Your Trip Itinerary", ln=True, align='C')
+    itinerarypdf.cell(200, 10, txt=f"Destination: {destination}", ln=True)
+    itinerarypdf.cell(200, 10, txt=f"Travel Dates: {travel_dates}", ln=True)
+    itinerarypdf.multi_cell(0, 10, txt=itinerary_text)
+
+    itinerarypdf.output("itinerary.pdf")
+    print("Your itinerary has been saved as 'itinerary.pdf'.")
+
 def createItinerary():
     print("Great! Let's start planning your trip.")
     destination = input("Where would you like to go? ")
@@ -43,30 +57,14 @@ def createItinerary():
         itinerary_text = "".join([part.text for part in parts])
         itinerary_text = unicodedata.normalize('NFKD', itinerary_text).encode('ascii', 'ignore').decode('ascii')
 
-        # create downloadable PDF
-        itinerarypdf = FPDF()
-        itinerarypdf.add_page()
-        itinerarypdf.set_font("Arial", size=12)
-
-        itinerarypdf.cell(200, 10, txt="Your Trip Itinerary", ln=True, align='C')
-        itinerarypdf.cell(200, 10, txt=f"Destination: {destination}", ln=True)
-        itinerarypdf.cell(200, 10, txt=f"Travel Dates: {travel_dates}", ln=True)
-        itinerarypdf.multi_cell(0, 10, txt=itinerary_text)
-
-        itinerarypdf.output("itinerary.pdf")
-        print("Your itinerary has been saved as 'itinerary.pdf'.")
-        return itinerary_text
-
+        return itinerary_text, destination, travel_dates
     except Exception as e:
-        return f"Error generating itinerary: {e}"
-
-
-
+        return f"Error generating itinerary: {e}", None, None
 
 #chat intro
 print("Welcome to your new favorite planning utility. My name is [blank] and I will be your travel assistant!")
 username = input("Let's start by getting you name: ")
-print(f"Hello {username}, I am excited to help you plan your next trip!")
+print(f"Hello {username}, I am excited to help you plan your next trip! \n")
 
 # Ask user for input + menu
 
@@ -84,12 +82,14 @@ if choice == 0:
     print("Thank you for using the travel assistant. Goodbye!")
     exit()
 elif choice == 1:
-    itinerary = createItinerary()
-    pdfChoice = input("Would you like to download your itinerary as a PDF? (yes/no): ").strip().lower()
-    if pdfChoice == 'yes':
-        print("Your itinerary has been saved as 'itinerary.pdf'.")
+    itinerary, destination, travel_dates = createItinerary()
+
+    pdfChoice = input("Would you like to download your itinerary as a PDF? (yes(Y)/no): ").strip().lower()
+    if pdfChoice == 'yes' or pdfChoice == 'Y':
+        print("Saving your itinerary PDF...")
+        saveItineraryToPDF(itinerary, destination, travel_dates)
     else:
-        print (f"Here is your itinerary:\n {itinerary}")
+        print(f"Here is your itinerary:\n{itinerary}")
     
 
 
