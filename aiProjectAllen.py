@@ -61,6 +61,68 @@ def createItinerary():
     except Exception as e:
         return f"Error generating itinerary: {e}", None, None
 
+def getTravelRecommendations():
+    # TO_DO: Implement travel recommendations
+    print("To get travel recommendations, please provide your ideal destination and interests.")
+    destination = input("What is your ideal destination(if none put 'Any') ? ")
+    interests = input("What are your interests? (e.g., culture, adventure, food) ")
+    # generate recommendations using Gemini
+    prompt = f"Provide travel recommendations for {destination} with interests in {interests}."
+    try:
+        response = model.generate_content(prompt)
+
+        if not response.candidates:
+            return "Error: No candidates found in the response."
+
+        first_candidate = response.candidates[0]
+        if not first_candidate.content:
+            return "Error: No content found in the response candidate."
+
+        parts = first_candidate.content.parts
+        if not parts:
+            return "Error: No text parts found in the response."
+
+        recommendations_text = "".join([part.text for part in parts])
+        recommendations_text = unicodedata.normalize('NFKD', recommendations_text).encode('ascii', 'ignore').decode('ascii')
+
+        print(f"Here are your travel recommendations:\n{recommendations_text}")
+    except Exception as e:
+        print(f"Error generating recommendations: {e}")
+        return None
+
+def findLocalAttractions(): 
+    # TO_DO: Implement local attractions
+    print("To find local attractions, please provide your destination or Zip-Code.")
+    destination = input("What is your destination/Zip? ")
+    # generate local attractions using Gemini
+    prompt = f"Find local attractions in {destination}."
+    try:
+        response = model.generate_content(prompt)
+
+        if not response.candidates:
+            return "Error: No candidates found in the response."
+
+        first_candidate = response.candidates[0]
+        if not first_candidate.content:
+            return "Error: No content found in the response candidate."
+
+        parts = first_candidate.content.parts
+        if not parts:
+            return "Error: No text parts found in the response."
+
+        attractions_text = "".join([part.text for part in parts])
+        attractions_text = unicodedata.normalize('NFKD', attractions_text).encode('ascii', 'ignore').decode('ascii')
+
+        print(f"Here are some local attractions:\n{attractions_text}")
+    except Exception as e:
+        print(f"Error generating local attractions: {e}")
+        return None
+
+
+
+
+
+
 #chat intro
 print("Welcome to your new favorite planning utility. My name is [blank] and I will be your travel assistant!")
 username = input("Let's start by getting you name: ")
@@ -89,7 +151,18 @@ elif choice == 1:
         print("Saving your itinerary PDF...")
         saveItineraryToPDF(itinerary, destination, travel_dates)
     else:
-        print(f"Here is your itinerary:\n{itinerary}")
+        print(f"Here is your itinerary:\n{itinerary}")   
+
+elif choice == 2:
+    getTravelRecommendations()
+elif choice == 3:   
+    # TO_DO: Implement local attractions
+    findLocalAttractions()
+elif choice == 4:   
+    # TO_DO: Implement flight booking
+    print("Flight booking feature is not implemented yet.")
+# TO_DO:    
+
     
 
 
