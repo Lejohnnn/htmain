@@ -2,3 +2,4 @@ pip install google-generativeai
 pip install fpdf
 streamlit run test.py
 pip install streamlit
+streamlit run aiProjectAllen.py
