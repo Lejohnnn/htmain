@@ -1,4 +1,7 @@
+from io import BytesIO
+from tkinter import Image
 import google.generativeai as genai
+from google.generativeai import types
 import os
 from fpdf import FPDF
 import unicodedata
@@ -15,6 +18,23 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 # TO_DO: 
 # ----- add pdf saving functionality
 # ----- space out print statements
+def checkCandidates(response):
+    if not response.candidates:
+        return "Error: No candidates found in the response."
+
+    first_candidate = response.candidates[0]
+    if not first_candidate.content:
+        return "Error: No content found in the response candidate."
+
+    parts = first_candidate.content.parts
+    if not parts:
+        return "Error: No text parts found in the response."
+
+    filteredResponse = "".join([part.text for part in parts])
+    filteredResponse = unicodedata.normalize('NFKD', filteredResponse).encode('ascii', 'ignore').decode('ascii')
+
+    return filteredResponse
+
 
 def saveItineraryToPDF(itinerary_text, destination, travel_dates):
     # create downloadable PDF
@@ -118,7 +138,28 @@ def findLocalAttractions():
         print(f"Error generating local attractions: {e}")
         return None
 
+def chatbotMain():
+    # TO_DO: Implement chatbot functionality
+    print("Welcome to the travel assistant chatbot! How can I help you today?")
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ['exit', 'quit']:
+            print("Goodbye!")
+            break
 
+        # generate response using Gemini
+        prompt = f"User: {user_input}\nAssistant:"
+        try:
+            response = model.generate_content(prompt)
+
+            chatbotResponse = checkCandidates(response)
+            if not chatbotResponse:
+                print("Error: No response generated.")
+                continue
+
+            print(f"Assistant: {chatbotResponse} \n Type 'quit' to exit the chat.")
+        except Exception as e:
+            print(f"Error generating response: {e}")
 
 
 
@@ -135,7 +176,7 @@ print("\n--- Menu ---")
 print("1. Create Trip Itinerary")
 print("2. Get Travel Recommendations")
 print("3. Find Local Attractions")
-print("4. Book Flights")
+print("4. General Q&A Bot")
 print("0. Quit")
 
 choice = int(input("Enter your choice: "))
@@ -152,15 +193,13 @@ elif choice == 1:
         saveItineraryToPDF(itinerary, destination, travel_dates)
     else:
         print(f"Here is your itinerary:\n{itinerary}")   
-
 elif choice == 2:
     getTravelRecommendations()
 elif choice == 3:   
     # TO_DO: Implement local attractions
     findLocalAttractions()
 elif choice == 4:   
-    # TO_DO: Implement flight booking
-    print("Flight booking feature is not implemented yet.")
+    chatbotMain()
 # TO_DO:    
 
     
