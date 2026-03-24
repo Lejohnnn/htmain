@@ -1,0 +1,13 @@
+.DS_Store
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+# Ignore temporary and unrelated files
+# detroit_bus_map.py
+detroit_bus_map.py
+woodward_route.kml.geojson
+
+# Ignore other project folders inside this one
+Motion/
+computerscienceportfolio/
